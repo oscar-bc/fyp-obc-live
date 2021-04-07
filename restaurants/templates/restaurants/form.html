@@ -82,13 +82,12 @@
 
   </head>
   <body>
-  <header>
+    <header>
         <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
             <a class="navbar-brand" href="/home">Itinerary Creator</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <center>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
@@ -111,7 +110,12 @@
                         {% endifequal %}
                     </ul>
                 </div>
-            </center>
+            {% ifequal article.creator|stringformat:"AnonymousUser" request.user.username %}
+                <span class="hello-msg">Hello, Guest</span>
+            {% else %}
+                <span class="hello-msg">Hello, {{request.user}}</span>
+                <span ><a  class="hello-msg" href="/logout" style="color:white">Logout</a></span>
+            {% endifequal %}
         </nav>
     </header>
     <main role="main" class="container">
@@ -119,6 +123,7 @@
       <h3>Create Itinerary</h3>
       <form method="GET" action=".">
         <div class="form-row">
+            <p style="color:red">{{ message }}</p>
             <div class="form-group col-12">
                 <label>Location</label>
                 <div class="input-group">
@@ -133,7 +138,7 @@
                 <label>Types of Food</label>
                 <select id="type_food" name="type_food" multiple="multiple">
                     {% for food in types_food %}
-                    <option value="{{ food }}">{{ food }}</option>
+                    <option value="{{ food }}">{{ food|title }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -171,7 +176,7 @@
                 <label>Interests</label>
                 <select id="interests" name="interests" multiple="multiple">
                     {% for attraction in types_attractions %}
-                    <option value="{{ attraction }}">{{ attraction }}</option>
+                    <option value="{{ attraction }}">{{ attraction|title }}</option>
                     {% endfor %}
                 </select>
             </div>

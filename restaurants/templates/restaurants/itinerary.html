@@ -87,7 +87,6 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <center>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
@@ -110,7 +109,12 @@
                         {% endifequal %}
                     </ul>
                 </div>
-            </center>
+            {% ifequal article.creator|stringformat:"AnonymousUser" request.user.username %}
+                <span class="hello-msg">Hello, Guest</span>
+            {% else %}
+                <span class="hello-msg">Hello, {{request.user}}</span>
+                <span ><a  class="hello-msg" href="/logout" style="color:white">Logout</a></span>
+            {% endifequal %}
         </nav>
     </header>
     <div class="container h-100">
@@ -126,10 +130,10 @@
                             <li>
                                 <h5>Day {{ forloop.counter }}</h5>
                                 <ul>
-                                    <h5>Breakfast at: {{ case.breakfast.title|title}}</h5>
-                                    <li>Type of food: {{ case.breakfast.type_food|title}}</li>
-                                    <li>Rated: {{ case.breakfast.rating}}/5 ({{ case.breakfast.amount_reviews}})</li>
-                                    <a href="{{ case.breakfast.review_link}}" style="color:black"><li>View reviews here</li></a>
+<!--                                    <h5>Breakfast at: {{ case.breakfast.title|title}}</h5>-->
+<!--                                    <li>Type of food: {{ case.breakfast.type_food|title}}</li>-->
+<!--                                    <li>Rated: {{ case.breakfast.rating}}/5 ({{ case.breakfast.amount_reviews}})</li>-->
+<!--                                    <a href="{{ case.breakfast.review_link}}" style="color:black"><li>View reviews here</li></a>-->
                                     <h5>Morning activity at: {{ case.morning_activity.title|title}}</h5>
                                     <li>Type of activity: {{ case.morning_activity.section|title}}</li>
                                     <li>Rated: {{ case.morning_activity.rating}}/5 ({{ case.morning_activity.amount_reviews}})</li>
@@ -157,12 +161,16 @@
                         <h3>{{ message }}</h3>
                     </div>
                     <div class="d-flex justify-content-center mt-3 login_container">
-                        <a href="/"><input class="btn login_btn" type="button" value="Back"></a>
-                        <p>&nbsp;</p>
                         {% ifnotequal article.creator|stringformat:"AnonymousUser" request.user.username %}
                             {% if message == "" %}
-                         <a href="/itinerary"><input class="btn login_btn" type="button" value="Save"></a>
+                            <a href="/check"><input class="btn login_btn" type="button" value="Back"></a>
+                            <p>&nbsp;</p>
+                             <a href="/itinerary"><input class="btn login_btn" type="button" value="Save"></a>
+                            {% else %}
+                            <a href="/home"><input class="btn login_btn" type="button" value="Back"></a>
                             {% endif %}
+                        {% else %}
+                         <a href="/home"><input class="btn login_btn" type="button" value="Back"></a>
                         {% endifnotequal %}
                     </div>
                 </div>

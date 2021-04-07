@@ -31,7 +31,8 @@ urlpatterns = [
     path('signup/', views.signup),
     path('view/', views.viewItineraries),
     path('view/itinerary/<str:itinerary_id>/', views.viewItinerary),
-    path('profile/', views.profile)
+    path('profile/', views.profile),
+    path('check/', views.check)
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

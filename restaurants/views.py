@@ -4,7 +4,7 @@ from .models import Restaurant
 from .models import Case
 from .models import Itinerary
 from attractions.models import Attraction
-from datetime import date
+from datetime import date, datetime
 from .forms import UserSignupForm
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
@@ -15,6 +15,10 @@ from django.contrib import messages
 
 def is_valid_queryparam(param):
     return param != '' and param is not None
+
+
+def check(request):
+    return render(request, 'restaurants/ask_save.html')
 
 
 def home(request):
@@ -69,9 +73,13 @@ def signup(request):
         userForm = UserSignupForm(request.POST)
         if userForm.is_valid():
             userForm.save()
-            user = userForm.cleaned_data.get('username')
-            messages.success(request, 'User account created for: ' + user)
-            return redirect('/login')
+            username = userForm.cleaned_data.get('username')
+            password = userForm.cleaned_data.get('password1')
+
+            user = authenticate(request, username=username, password=password)
+            messages.success(request, 'User account created for: ' + username)
+            auth_login(request, user)
+            return redirect('/')
     context = {'form': userForm}
     return render(request, 'restaurants/signup.html', context)
 
@@ -102,12 +110,14 @@ def form(request):
     start_date_query = request.GET.get('start_date')
     end_date_query = request.GET.get('end_date')
     type_holiday_query = request.GET.get('type_holiday')
+    current_date = datetime.today().strftime('%Y-%m-%d')
 
     all_types_food = []
     all_types_attractions = []
     all_types_holidays = sorted(list({'Lads', 'Family', 'Cultural', 'Any', 'Romantic', 'Nature'}))
 
     enough_restaurants = True
+    enough_attractions = True
     valid_form = True
     message = ""
 
@@ -134,6 +144,7 @@ def form(request):
 
     time_of_year = 0
     num_days = 1
+    valid_date = True
     if is_valid_queryparam(start_date_query) and is_valid_queryparam(end_date_query):
         start_date_query = start_date_query.split("-")
         start_date = date(int(start_date_query[0]), int(start_date_query[1]), int(start_date_query[2]))
@@ -141,6 +152,8 @@ def form(request):
         end_date = date(int(end_date_query[0]), int(end_date_query[1]), int(end_date_query[2]))
         num_days = (end_date - start_date).days
         time_of_year = int(end_date_query[1])
+        if end_date < start_date or num_days == 0:
+            valid_date = False
     valid_restaurants = []
     valid_attractions = []
 
@@ -234,16 +247,23 @@ def form(request):
                             valid_attractions.remove(valid_attractions[0])
     if len(valid_restaurants) <= 3 and location_query is not None:
         enough_restaurants = False
+    if len(valid_attractions) <= 2 and location_query is not None:
+        enough_attractions = False
     cases = []
     temp_restaurant = None
     temp_attraction = None
 
     if valid_form is False:
         message = "Please fill out form correctly"
-    elif enough_restaurants is False:
-        message = "Please broaden search results"
+    else:
+        if enough_restaurants is False:
+            message += "Please add more restaurant types. "
+        if valid_date is False:
+            message += "Please insert valid dates. "
+        if enough_attractions is False:
+            message += "Please add more types of interests. "
 
-    if location_query is not None and enough_restaurants is True:
+    if location_query is not None and enough_restaurants is True and valid_date is True:
         for day in range(num_days):
             if len(valid_cases) is not 0:
                 cases.append(valid_cases[0])
@@ -342,7 +362,7 @@ def form(request):
     }
     if len(cases) != 0:
         return render(request, 'restaurants/itinerary.html', context)
-    elif enough_restaurants is False or valid_form is False:
-        return render(request, 'restaurants/error_message.html', context)
+    elif enough_restaurants is False or valid_form is False or enough_attractions is False or valid_date is False:
+        return render(request, 'restaurants/form.html', context)
     else:
         return render(request, 'restaurants/form.html', context)

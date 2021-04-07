@@ -17,6 +17,10 @@
             background-repeat: no-repeat;
             background-size: cover;
 		}
+        .hello-msg{
+        color: #fff;
+        margin-right: 20px;
+      }
 	</style>
 
 </head>
@@ -27,7 +31,6 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <center>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
@@ -50,7 +53,12 @@
                         {% endifequal %}
                     </ul>
                 </div>
-            </center>
+            {% ifequal article.creator|stringformat:"AnonymousUser" request.user.username %}
+                <span class="hello-msg">Hello, Guest</span>
+            {% else %}
+                <span class="hello-msg">Hello, {{request.user}}</span>
+                <span ><a  class="hello-msg" href="/logout" style="color:white">Logout</a></span>
+            {% endifequal %}
         </nav>
     </header>
 </body>

@@ -1,0 +1,121 @@
+html,body {
+
+    width:100%;
+    height:100%;
+  }
+  body {
+   margin: 0;
+  }
+  #slideshow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width:100%;
+    height:100%;
+  }
+  .elemnt,.elemnt1,.elemnt2,.elemnt3,.elemnt4,.elemnt5,.elemnt6,.elemnt7,.elemnt8,.elemnt9,.elemnt10,.elemnt11,.elemnt12,.elemnt13,.elemnt14,.elemnt15 {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  display: inline-block;
+  text-align: center;
+  }
+  .elemnt {
+    animation: xfade 51s 48s infinite;
+    background-image: url("/static/images/ireland.jpg");
+  }
+  .elemnt1 {
+    animation: xfade 51s 45s infinite;
+    background-image: url("/static/images/ireland2.jpg");
+
+  }
+  .elemnt2 {
+    animation: xfade 51s 42s infinite;
+    background-image: url("/static/images/ireland3.jpg");
+  }
+  .elemnt3 {
+    animation: xfade 51s 39s infinite;
+    background-image: url("/static/images/ireland4.jpg");
+
+  }
+  .elemnt4 {
+    animation: xfade 51s 36s infinite;
+    background-image: url("/static/images/ireland7.jpg");
+
+  }
+  .elemnt5 {
+    animation: xfade 51s 33s infinite;
+    background-image: url("/static/images/ireland6.jpg");
+
+  }
+  .elemnt6 {
+    animation: xfade 51s 30s infinite;
+    background-image: url("/static/images/ireland8.jpg");
+
+  }
+  .elemnt7 {
+    animation: xfade 51s 27s infinite;
+    background-image: url("/static/images/ireland12.jpg");
+
+  }
+  .elemnt8 {
+    animation: xfade 51s 24s infinite;
+    background-image: url("/static/images/ireland13.jpg");
+
+  }
+  .elemnt9 {
+    animation: xfade 51s 18s infinite;
+    background-image: url("/static/images/ireland9.jpg");
+
+  }
+  .elemnt10 {
+    animation: xfade 51s 15s infinite;
+    background-image: url("/static/images/ireland10.jpg");
+
+  }
+  .elemnt11 {
+    animation: xfade 51s 12s infinite;
+    background-image: url("/static/images/ireland11.jpg");
+
+  }
+  .elemnt12 {
+    animation: xfade 51s 9s infinite;
+    background-image: url("/static/images/ireland12.jpg");
+
+  }
+  .elemnt13 {
+    animation: xfade 51s 6s infinite;
+    background-image: url("/static/images/ireland14.jpg");
+
+  }
+  .elemnt14 {
+    animation: xfade 51s 3s infinite;
+    background-image: url("/static/images/ireland.jpg");
+
+  }
+      /* Centered text */
+    .centered {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  .hello-msg{
+          color: #fff;
+          margin-right: 20px;
+        }
+  @keyframes xfade{
+    17% {
+      opacity:1;
+    }
+    25% {
+      opacity:0;
+    }
+    92% {
+      opacity:0;
+    }
+  }

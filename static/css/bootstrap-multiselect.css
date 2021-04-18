@@ -6,8 +6,8 @@ span.multiselect-native-select select{
     border:0!important;
     clip:rect(0 0 0 0)!important;
     height:1px!important;
-    margin:-1px -1px -1px -3px!important
-    ;overflow:hidden!important;
+    margin:-1px -1px -1px -3px!important;
+    overflow:hidden!important;
     padding:0!important;
     position:absolute!important;
     width:1px!important;
@@ -15,7 +15,7 @@ span.multiselect-native-select select{
 }
 
 .multiselect-container{
-    position:absolute;
+    position:relative;
     list-style-type:none;
     margin:0;padding:0
 }

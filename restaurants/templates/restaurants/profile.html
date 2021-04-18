@@ -1,7 +1,7 @@
 {% load static %}
 <html>
 <head>
-    <title>Profile</title>
+    <title>Itinerary Creator - Profile</title>
     <link rel="stylesheet" href="{% static 'css/profile.css' %}" type="text/css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
@@ -16,6 +16,10 @@
             background-repeat: no-repeat;
             background-size: cover;
 		}
+		.hello-msg{
+        color: #fff;
+        margin-right: 20px;
+      }
 	</style>
 </head>
 <body>
@@ -31,7 +35,7 @@
                             <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="/home">Create Itinerary<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="/location">Create Itinerary<span class="sr-only">(current)</span></a>
                         </li>
                         {% ifequal article.creator|stringformat:"AnonymousUser" request.user.username %}
                             <li class="nav-item active">

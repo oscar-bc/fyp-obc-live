@@ -99,11 +99,37 @@ def viewItinerary(request, itinerary_id):
     return render(request, 'restaurants/view_itinerary.html', context)
 
 
+def location(request):
+    location_query = request.GET.get('location')
+    restaurants = Restaurant.objects.all()
+    locations = []
+    for restaurant in restaurants:
+        locations.append(restaurant.location)
+    all_unique_locations = sorted(list(set(locations)))
+    message = ""
+    valid = False
+
+    if location_query == "":
+        message = "Please enter a location"
+    if location_query != "" and location_query is not None:
+        for loc in all_unique_locations:
+            if loc == location_query.upper():
+                valid = True
+        if valid is False:
+            message = "The location you have entered is not valid"
+        else:
+            request.session['location'] = location_query
+            return redirect('/home')
+    context = {'message': message,
+               'locations': all_unique_locations}
+    return render(request, 'restaurants/location_form.html', context)
+
+
 def form(request):
     all_cases = Case.objects.all()
     restaurants = Restaurant.objects.all()
     attractions = Attraction.objects.all()
-    location_query = request.GET.get('location')
+    location_query = request.session['location']
     types_of_food_query = request.GET.getlist('type_food')
     price_query = request.GET.get('price')
     interests_query = request.GET.getlist('interests')
@@ -121,26 +147,12 @@ def form(request):
     valid_form = True
     message = ""
 
-    if location_query is "" or types_of_food_query is "" or interests_query is "" or start_date_query is "":
+    if types_of_food_query is "" or interests_query is "" or start_date_query is "":
         valid_form = False
 
     type_holiday = "ANY"
     if type_holiday_query is not None:
         type_holiday = type_holiday_query.upper()
-
-    for restaurant in restaurants:
-        if " " in restaurant.type_food:
-            types = restaurant.type_food.split(" ")
-            for type in types:
-                all_types_food.append(type)
-        else:
-            all_types_food.append(restaurant.type_food)
-    all_unique_types_food = sorted(list(set(all_types_food)))
-    all_unique_types_food.pop(0)
-
-    for attraction in attractions:
-        all_types_attractions.append(attraction.section)
-    all_unique_types_attractions = sorted(list(set(all_types_attractions)))
 
     time_of_year = 0
     num_days = 1
@@ -160,6 +172,32 @@ def form(request):
     if is_valid_queryparam(location_query):
         restaurants = restaurants.filter(location=location_query.upper())
         attractions = attractions.filter(location=location_query.upper())
+
+    for restaurant in restaurants:
+        if " " in restaurant.type_food:
+            types = restaurant.type_food.split(" ")
+            for type in types:
+                all_types_food.append(type)
+        else:
+            all_types_food.append(restaurant.type_food)
+    all_unique_types_food = sorted(list(set(all_types_food)))
+    all_unique_types_food.pop(0)
+    for type_food in all_unique_types_food:
+        if type_food == "BARS" or type_food == "BITES" or type_food == "CREOLE" or type_food == "EASTERN" or type_food == "FAST" or type_food == "MARKET" or type_food == "N/A" or type_food == "PUBS" or type_food == "SOUTH":
+            all_unique_types_food.remove(type_food)
+        elif type_food == "MIDDLE":
+            all_unique_types_food.remove(type_food)
+            all_types_food.append("MIDDLE EASTERN")
+        elif type_food == "ZEALAND":
+            all_unique_types_food.remove(type_food)
+            all_types_food.append("NEW ZEALAND")
+        elif type_food == "Food":
+            all_unique_types_food.remove(type_food)
+            all_types_food.append("FAST FOOD")
+    all_unique_types_food = sorted(list(set(all_unique_types_food)))
+    for attraction in attractions:
+        all_types_attractions.append(attraction.section)
+    all_unique_types_attractions = sorted(list(set(all_types_attractions)))
 
     if is_valid_queryparam(price_query):
         restaurants = restaurants.filter(price=price_query.upper())
@@ -186,9 +224,15 @@ def form(request):
     if valid_attractions is not None:
         valid_attractions.sort(key=lambda c: c.amount_reviews, reverse=True)
         temp_valid_attractions = valid_attractions
+
+    if len(valid_restaurants) <= 3 and location_query is not None:
+        enough_restaurants = False
+    if len(valid_attractions) <= 2 and location_query is not None:
+        enough_attractions = False
+
     similarity = 0
     valid_cases = []
-    if types_of_food_query is not None and interests_query is not None and location_query is not None:
+    if types_of_food_query is not None and interests_query is not None and location_query is not None and enough_attractions is True and enough_restaurants is True:
         for case in all_cases:
             similarity = 0
             if case.location == location_query.upper() and case.price == price_query.upper():
@@ -245,17 +289,13 @@ def form(request):
                         if afternoon is not True:
                             improved_case.afternoon_activity = valid_attractions[0]
                             valid_attractions.remove(valid_attractions[0])
-    if len(valid_restaurants) <= 3 and location_query is not None:
-        enough_restaurants = False
-    if len(valid_attractions) <= 2 and location_query is not None:
-        enough_attractions = False
     cases = []
     temp_restaurant = None
     temp_attraction = None
 
     if valid_form is False:
         message = "Please fill out form correctly"
-    else:
+    elif price_query is not None:
         if enough_restaurants is False:
             message += "Please add more restaurant types. "
         if valid_date is False:
@@ -263,7 +303,7 @@ def form(request):
         if enough_attractions is False:
             message += "Please add more types of interests. "
 
-    if location_query is not None and enough_restaurants is True and valid_date is True:
+    if location_query is not None and enough_restaurants is True and valid_date is True and enough_attractions is True:
         for day in range(num_days):
             if len(valid_cases) is not 0:
                 cases.append(valid_cases[0])
@@ -274,24 +314,6 @@ def form(request):
                 if valid_attractions is None or len(valid_attractions) <= 2:
                     valid_attractions += temp_valid_attractions
                 if valid_restaurants is not None and valid_attractions is not None:
-                    while temp_restaurant is not None and len(valid_restaurants) >= 3 \
-                            and valid_restaurants[0].title == temp_restaurant.title:
-                        # print(len(valid_restaurants))
-                        valid_restaurants.remove(valid_restaurants[0])
-                    while len(valid_restaurants) >= 2 and valid_restaurants[0].title == valid_restaurants[1].title:
-                        # print(len(valid_restaurants))
-                        valid_restaurants.remove(valid_restaurants[1])
-                    while len(valid_restaurants) >= 2 and valid_restaurants[1].title == valid_restaurants[2].title:
-                        # print(len(valid_restaurants))
-                        valid_restaurants.remove(valid_restaurants[2])
-                    while temp_attraction is not None and len(valid_attractions) >= 2 \
-                            and valid_attractions[0].title == temp_attraction.title:
-                        # print(len(valid_attractions))
-                        valid_attractions.remove(valid_attractions[0])
-                    while len(valid_attractions) >= 2 and valid_attractions[0].title == valid_attractions[1].title:
-                        # print(len(valid_attractions))
-                        valid_attractions.remove(valid_attractions[1])
-
                     if valid_restaurants is None or len(valid_restaurants) <= 3:
                         valid_restaurants += temp_valid_restaurants
                     if valid_attractions is None or len(valid_attractions) <= 2:

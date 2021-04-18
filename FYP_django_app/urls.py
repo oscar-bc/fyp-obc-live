@@ -32,6 +32,7 @@ urlpatterns = [
     path('view/', views.viewItineraries),
     path('view/itinerary/<str:itinerary_id>/', views.viewItinerary),
     path('profile/', views.profile),
+    path('location/', views.location),
     path('check/', views.check)
 ]
 
